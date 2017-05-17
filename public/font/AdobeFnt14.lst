@@ -1,0 +1,183 @@
+%!Adobe-FontList 1.14
+%Locale:0x412
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:CID
+FontName:NanumSquareOTFB
+FamilyName:NanumSquareOTF
+StyleName:Bold
+FullName:NanumSquareOTF Bold
+MenuName:나눔스퀘어OTF Bold
+StyleBits:0
+FamilyNameNative:나눔스퀘어OTF
+StyleNameNative:Bold
+FullNameNative:나눔스퀘어OTF Bold
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareB.otf
+DataFormat:sfntData
+isCFF:yes
+FileLength:514816
+FileModTime:1493569290
+WeightClass:700
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:NanumSquareB
+FamilyName:NanumSquare
+StyleName:Bold
+FullName:NanumSquare Bold
+MenuName:나눔스퀘어 Bold
+StyleBits:0
+FamilyNameNative:나눔스퀘어
+StyleNameNative:Bold
+FullNameNative:나눔스퀘어 Bold
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareB.ttf
+DataFormat:sfntData
+FileLength:733500
+FileModTime:1493569290
+WeightClass:700
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:CID
+FontName:NanumSquareOTFEB
+FamilyName:NanumSquareOTF
+StyleName:ExtraBold
+FullName:NanumSquareOTF ExtraBold
+MenuName:나눔스퀘어OTF ExtraBold
+StyleBits:0
+FamilyNameNative:나눔스퀘어OTF
+StyleNameNative:ExtraBold
+FullNameNative:나눔스퀘어OTF ExtraBold
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareEB.otf
+DataFormat:sfntData
+isCFF:yes
+FileLength:523540
+FileModTime:1493569290
+WeightClass:800
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:NanumSquareEB
+FamilyName:NanumSquare
+StyleName:ExtraBold
+FullName:NanumSquare ExtraBold
+MenuName:나눔스퀘어 ExtraBold
+StyleBits:0
+FamilyNameNative:나눔스퀘어
+StyleNameNative:ExtraBold
+FullNameNative:나눔스퀘어 ExtraBold
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareEB.ttf
+DataFormat:sfntData
+FileLength:726684
+FileModTime:1493569290
+WeightClass:800
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:CID
+FontName:NanumSquareOTFL
+FamilyName:NanumSquareOTF
+StyleName:Light
+FullName:NanumSquareOTF Light
+MenuName:나눔스퀘어OTF Light
+StyleBits:0
+FamilyNameNative:나눔스퀘어OTF
+StyleNameNative:Light
+FullNameNative:나눔스퀘어OTF Light
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareL.otf
+DataFormat:sfntData
+isCFF:yes
+FileLength:514976
+FileModTime:1493569290
+WeightClass:300
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:NanumSquareL
+FamilyName:NanumSquare
+StyleName:Light
+FullName:NanumSquare Light
+MenuName:나눔스퀘어 Light
+StyleBits:0
+FamilyNameNative:나눔스퀘어
+StyleNameNative:Light
+FullNameNative:나눔스퀘어 Light
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareL.ttf
+DataFormat:sfntData
+FileLength:750932
+FileModTime:1493569290
+WeightClass:300
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:CID
+FontName:NanumSquareOTFR
+FamilyName:NanumSquareOTF
+StyleName:Regular
+FullName:NanumSquareOTF Regular
+MenuName:나눔스퀘어OTF
+StyleBits:0
+FamilyNameNative:나눔스퀘어OTF
+StyleNameNative:Regular
+FullNameNative:나눔스퀘어OTF Regular
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareR.otf
+DataFormat:sfntData
+isCFF:yes
+FileLength:492584
+FileModTime:1493569290
+WeightClass:400
+WidthClass:5
+AngleClass:0
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:NanumSquareR
+FamilyName:NanumSquare
+StyleName:Regular
+FullName:NanumSquare Regular
+MenuName:나눔스퀘어
+StyleBits:0
+FamilyNameNative:나눔스퀘어
+StyleNameNative:Regular
+FullNameNative:나눔스퀘어 Regular
+WritingScript:Korean
+OutlineFileName:C:\Users\TopCoder\Desktop\newproject\Font\NanumSquareR.ttf
+DataFormat:sfntData
+FileLength:723640
+FileModTime:1493569290
+WeightClass:400
+WidthClass:5
+AngleClass:0
+%EndFont
+

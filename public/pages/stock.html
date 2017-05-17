@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> <!-- IE 호환모드방지 -->
+
+	<link href="stylesheets/jieun_css.css" rel="stylesheet" media="all" type="text/css">
+</head>
+
+
+<body>
+
+	<!-- Navigation bar -->
+	<nav class="navbar-custom">
+		<div class="navbar-wrapper">
+			<div class="navleft">
+				<button type="button" class="btntransp">
+					<img src="images/gray_200px.PNG">
+				</button>
+			</div>
+
+			<div class="navright">
+				<li><a href="http://203.246.113.178:3000">HOME</a></li>
+				<li><a href="http://203.246.113.178:3000/about">ABOUT</a></li>
+				<li><a href="http://203.246.113.178:3000/forecasting">FORECASTING</a></li>
+				<li><a href="http://203.246.113.178:3000">LOGIN</a></li>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Main Contents -->
+	<div class="contents">
+		<span>
+			<h1><%CNAME%></h1><br>
+
+			<table border="0" class="detailtable">
+				<tr>
+					<td rowspan="3">
+						<h1 class="red"><%CURRENTPRICE%></h1>
+						<span class="bold">전일대비</span>
+						<span class="red">▲<%GAP%> | <%RATE%>%</span>
+					</td>
+					<td><span class="bold">전일</span> <%PREVIOUSPRICE%></td>
+					<td><span class="bold">고가</span> <span class="red"><%HIGHPRICE%></span></td>
+					<td><span class="bold">거래량</span> <%VOLUME%></td>
+				</tr>
+				<tr>
+					<td><span class="bold">시가</span> <%MARKETPRICE%></td>
+					<td><span class="bold">저가</span> <%LOWPRICE%></td>
+					<td><span class="bold">거래대금</span> <%TRADECOST%>백만</td>
+				</tr>
+			</table>
+
+			<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+			<div id="chart_div" style="width:100%; height: 400px"></div><br>
+
+			<p>
+			<h2>관련 종목</h2>
+			<a href="">LG전자</a> / <a href="">안랩</a> / <a href="">한미약품</a> 
+			</p>
+
+		</span>
+	</div>
+
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+	<!-- Footer -->
+	<footer>
+		<p class="copyright"> 
+			<br><br><br><br><br>Copyright &copy; KMUCS GOODLUCK <br><br>
+			<a href="https://github.com/jieeeun/2017Capstone_09">Github</a>&nbsp;&nbsp;
+			<a href="http://capstone.cs.kookmin.ac.kr/timbyeol-jinhaeng-hyeonhwang-1dangye-1/9jo-timmyeong">CapstoneSite</a>
+		</p>
+	</footer>
+
+
+	<script>
+	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawCurveTypes);
+
+	function drawCurveTypes() {
+		var data = new google.visualization.DataTable();
+		data.addColumn('number', 'X');
+		data.addColumn('number', '실제결과');
+		data.addColumn('number', '예측');
+
+		data.addRows([
+			[1, 2123000, 2022000], [2, 2120000, 2010000], [3, 2040000, 1900000], [4, 2074000, 2098000], [5, 2089000, 1990000], [6, 2099000, 2000000], [7, 2060000, 1990000], [8, 2070200, 2060000], [9, 2009200, 2018000], [10, 2080000, 2020000], [11, 2097000, 2030000], [12, 2080000, 2020000]
+		]);
+
+		var options = {
+			hAxis: {
+				title: 'date'
+			},
+			vAxis: {
+				title: 'close'
+			},
+			series: {
+				1: {curveType: 'function'}
+			}
+		};
+
+		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		chart.draw(data, options);
+	}
+</script>
+
+</body>
+
+</html>

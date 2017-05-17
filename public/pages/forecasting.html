@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> <!-- IE 호환모드방지 -->
+
+	<link href="stylesheets/jieun_css.css" rel="stylesheet" media="all" type="text/css">
+</head>
+
+
+<body>
+	<!-- Navigation bar -->
+	<nav class="navbar-custom">
+		<div class="navbar-wrapper">
+			<div class="navleft">
+				<button type="button" class="btntransp">
+					<img src="images/gray_200px.PNG">
+				</button>
+			</div>
+
+			<div class="navright">
+				<li><a href="http://203.246.113.178:3000">HOME</a></li>
+				<li><a href="http://203.246.113.178:3000/about">ABOUT</a></li>
+				<li><a href="http://203.246.113.178:3000/forecasting">FORECASTING</a></li>
+				<li><a href="http://203.246.113.178:3000">LOGIN</a></li>
+			</div>
+		</div>
+	</nav>
+
+	<div class="contents">
+		<span>
+			<h1>코스피</h1>
+			<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+			<div id="drawKospi"></div>
+			<div>
+				<table border="0" class="top3table">
+					<tr>
+						<td colspan="2"><h2>상승세 예측 Top3</h2></td>
+						<td colspan="2"><h2>하락세 예측 Top3</h2></td>
+					</tr>
+					<tr>
+						<td><a href="http://203.246.113.178:3000/stock?code=005930">삼성전자</a></td>
+						<td class="red">▲8,600</td>
+						<td><%DOWNTREND1%></td>
+						<td class="blue">▼4,600</td>
+					</tr>
+					<tr>
+						<td><%UPTREND2%></td>
+						<td class="red">▲2,360</td>
+						<td><%DOWNTREND2%></td>
+						<td class="blue">▼2,360</td>
+					</tr>
+					<tr>
+						<td><%UPTREND3%></td>
+						<td class="red">▲1,080</td>
+						<td><%DOWNTREND3%></td>
+						<td class="blue">▼1,080</td>
+					</tr>
+				</table>
+			</div>
+			<a class="more" href="">(+) 전체보기</a>
+		</span>
+
+		<hr class="kospiandkosdaq">
+
+		<span>
+			<h1>코스닥</h1>
+			<div id="drawKosdaq"></div>
+			<div>
+				<table border="0" class="top3table">
+					<tr>
+						<td colspan="2"><h2>상승세 예측 Top3</h2></td>
+						<td colspan="2"><h2>하락세 예측 Top3</h2></td>	
+					</tr>
+					<tr>
+						<td>셀트리온</td>
+						<td class="red">▲1,600</td>
+						<td>카카오</td>
+						<td class="blue">▼7,600</td>
+					</tr>
+					<tr>
+						<td>메디톡스</td>
+						<td class="red">▲900</td>
+						<td>CJ오쇼핑</td>
+						<td class="blue">▼6,800</td>
+					</tr>
+					<tr>
+						<td>서울반도체</td>
+						<td class="red">▲300</td>
+						<td>리노공업</td>
+						<td class="blue">▼1,860</td>
+					</tr>
+				</table>
+			</div>
+			<a class="more" href="">(+) 전체보기</a>
+		</span>
+	</div>
+	<br><br><br><br><br><br><br>
+	<!-- Footer -->
+	<footer>
+		<p class="copyright"> 
+			<br><br><br><br><br>Copyright &copy; KMUCS GOODLUCK <br><br>
+			<a href="https://github.com/jieeeun/2017Capstone_09">Github</a>&nbsp;&nbsp;
+			<a href="http://capstone.cs.kookmin.ac.kr/timbyeol-jinhaeng-hyeonhwang-1dangye-1/9jo-timmyeong">CapstoneSite</a>
+		</p>
+	</footer>
+
+
+
+
+<script>
+
+</script>
+
+<script>
+	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawKospi);
+
+
+	function drawKospi() {
+
+	      var data = new google.visualization.DataTable();
+	      data.addColumn('number', 'X');
+	      data.addColumn('number', 'KOSPI');
+
+	      data.addRows([
+	        [0, 0],   [1, 10],  [2, 23],  [3, 17],  [4, 18],  [5, 9],
+	        [6, 11],  [7, 27],  [8, 33],  [9, 40],  [10, 32], [11, 35],
+	        [12, 30], [13, 40], [14, 42], [15, 47], [16, 44], [17, 48],
+	        [18, 52], [19, 54], [20, 42], [21, 55], [22, 56], [23, 57],
+	        [24, 60], [25, 50], [26, 52], [27, 51], [28, 49], [29, 53],
+	        [30, 55], [31, 60], [32, 61], [33, 59], [34, 62], [35, 65],
+	        [36, 62], [37, 58], [38, 55], [39, 61], [40, 64], [41, 65],
+	        [42, 63], [43, 66], [44, 67], [45, 69], [46, 69], [47, 70],
+	        [48, 72], [49, 68], [50, 66], [51, 65], [52, 67], [53, 70],
+	        [54, 71], [55, 72], [56, 73], [57, 75], [58, 70], [59, 68],
+	        [60, 64], [61, 60], [62, 65], [63, 67], [64, 68], [65, 69],
+	        [66, 70], [67, 72], [68, 75], [69, 80]
+	      ]);
+
+	      var options = {
+	        hAxis: {
+	          title: 'Time'
+	        },
+	        vAxis: {
+	          title: 'Price'
+	        }
+	      };
+
+	      var chart = new google.visualization.LineChart(document.getElementById('drawKospi'));
+
+	      chart.draw(data, options);
+	    }
+</script>
+
+<script>
+	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawKosdaq);
+
+	function drawKosdaq() {
+
+	      var data = new google.visualization.DataTable();
+	      data.addColumn('number', 'X');
+	      data.addColumn('number', 'KOSDAQ');
+
+	      data.addRows([
+	        [0, 0],   [1, 10],  [2, 23],  [3, 17],  [4, 18],  [5, 9],
+	        [6, 11],  [7, 27],  [8, 33],  [9, 40],  [10, 32], [11, 35],
+	        [12, 30], [13, 40], [14, 42], [15, 47], [16, 44], [17, 48],
+	        [18, 52], [19, 54], [20, 42], [21, 55], [22, 56], [23, 57],
+	        [24, 60], [25, 50], [26, 52], [27, 51], [28, 49], [29, 53],
+	        [30, 55], [31, 60], [32, 61], [33, 59], [34, 62], [35, 65],
+	        [36, 62], [37, 58], [38, 55], [39, 61], [40, 64], [41, 65],
+	        [42, 63], [43, 66], [44, 67], [45, 69], [46, 69], [47, 70],
+	        [48, 72], [49, 68], [50, 66], [51, 65], [52, 67], [53, 70],
+	        [54, 71], [55, 72], [56, 73], [57, 75], [58, 70], [59, 68],
+	        [60, 64], [61, 60], [62, 65], [63, 67], [64, 68], [65, 69],
+	        [66, 70], [67, 72], [68, 75], [69, 80]
+	      ]);
+
+	      var options = {
+	        hAxis: {
+	          title: 'Time'
+	        },
+	        vAxis: {
+	          title: 'Price'
+	        }
+	      };
+
+	      var chart = new google.visualization.LineChart(document.getElementById('drawKosdaq'));
+
+	      chart.draw(data, options);
+	    }
+</script>
+</body>
+
+</html>

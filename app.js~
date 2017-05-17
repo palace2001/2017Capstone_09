@@ -1,0 +1,24 @@
+var express = require('express');
+var app = express();
+var fs = require('fs');
+
+
+
+app.get('/', function (req, res) {
+  res.send('Hello World!');
+})
+
+
+
+app.get('/insert', function (req, res) {
+  req.query.seq = Number(req.query.seq);
+  req.query.value = Number(req.query.value);
+  res.send(req.query); // check data
+  console.log("Get data !!\n" + JSON.stringify(req.query));
+})
+
+
+
+app.listen(3000, function () {
+  console.log('Server listening on port 3000!');
+})
