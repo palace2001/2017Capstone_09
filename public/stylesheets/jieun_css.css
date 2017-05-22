@@ -20,6 +20,11 @@ body {
 	color: #181818;
 }
 
+a {
+	text-decoration: none;
+	color: #181818;
+}
+
 .red {
 	color: red;
 	font-family: 'NanumSquareEB';		
@@ -135,6 +140,12 @@ body {
 	height: 400px;
 	padding: 30px;
 }
+.contain_list {
+	position: relative;
+	width:96%;
+	min-height: 400px;
+	padding: 30px;
+}
 .contain_gray {
 	position: relative; 
 	width:96%; 
@@ -219,3 +230,42 @@ footer a {
 	margin-bottom: 0px;
 	border-bottom: 0px;
 }
+
+.subtitle {
+	font-size: 20px;
+	font-family: 'NanumSquareEB';
+	width: 130px;
+	text-align: center;
+	margin: auto;
+}
+.mytable {
+  width:800px;
+  margin: auto;
+  border-collapse: collapse;
+  border-top: 3px solid #212121;
+text-align: center;
+}  
+.mytable th {
+  background: #f0f6f9;
+	position: relative;
+
+}
+.mytable th,
+.mytable td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+.mytable th:first-child,
+.mytable td:first-child {
+  border-left: 0;
+}
+.mytable th:last-child,
+.mytable td:last-child {
+  border-right: 0;
+}
+
+
+.myinput {
+	width: 200px;
+}
+.th-inner{position: absolute; top:0; line-height: 30px; text-align: left;}

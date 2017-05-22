@@ -24,6 +24,16 @@ var stockSchema = mongoose.Schema({
     description: String
 });
 
-module.exports = mongoose.model('stock', stockSchema);/**
+// creates DB schema for stock
+var corpSchema = mongoose.Schema({
+    _id: String,
+    market: String,
+    name: String,
+    lately_trade_data: Number
+});
+
+
+
+module.exports = mongoose.model('corps', corpSchema);/**
  * Created by algorithm on 17. 5. 17.
  */

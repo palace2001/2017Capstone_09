@@ -2,7 +2,45 @@ var express = require('express');
 var app = express();
 var fs = require('fs');
 var cheerio = require("cheerio"), req = require("tinyreq");
-var Stock = require('./public/javascripts/stock');
+var forEach = require("async-foreach").forEach;
+var Corp = require('./public/javascripts/corp');
+var bodyParser = require('body-parser');
+// var Data = require('./public/javascripts/data');
+var DataStock = require('./public/javascripts/dataStock');
+var Users = require('./public/javascripts/user');
+var passport = require('passport');
+var session = require('express-session');
+
+// var bodyParser = require('body-parser');
+// var errorHandler = require('errorhandler');
+var cookieParser = require('cookie-parser');
+var MongoStore = require('connect-mongo')(session);
+var CT = require('./public/modules/country-list');
+var AM = require('./public/modules/account-manager');
+var EM = require('./public/modules/email-dispatcher');
+
+
+app.use(cookieParser());
+
+
+var dbHost = process.env.DB_HOST || 'localhost'
+var dbPort = process.env.DB_PORT || 27017;
+var dbName = process.env.DB_NAME || 'stock_db';
+
+var dbURL = 'mongodb://'+dbHost+':'+dbPort+'/'+dbName;
+if (app.get('env') == 'live'){
+// prepend url with authentication credentials //
+    dbURL = 'mongodb://'+process.env.DB_USER+':'+process.env.DB_PASS+'@'+dbHost+':'+dbPort+'/'+dbName;
+}
+
+app.use(session({
+        secret: 'faeb4453e5d14fe6f6d04637f78077c76c73d1b4',
+        proxy: true,
+        resave: true,
+        saveUninitialized: true,
+        store: new MongoStore({ url: dbURL })
+    })
+);
 
 // Stock.findOne({_id: "005930" }, function(err, stock){
 //     if(err) console.log(err);
@@ -10,95 +48,261 @@ var Stock = require('./public/javascripts/stock');
 // })
 
 
+app.set('views', __dirname + '/router/views');
+app.set('view engine', 'jade');
+
+
+app.use(passport.initialize());
+app.use(passport.session()); //로그인 세션 유지
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+require('./router/routes')(app);
+
+
 app.use(express.static('public'));
 
 
 app.get('/', function (req, res) {
     fs.readFile('public/pages/main.html', function (err, data) {
+        var html = data.toString();
+
+        if (req.session.user == null){
+            html = html.replace('<%LHYPER%>', "login");
+            html = html.replace('<%LTEXT%>', "LOGIN");
+        }
+        else {
+            html = html.replace('<%LHYPER%>', "home");
+            html = html.replace('<%LTEXT%>', "ACCOUNT");
+        }
+
+
         res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(data);
+        res.end(html);
     });
 });
 
 app.get('/about', function (req, res) {
     fs.readFile('public/pages/about.html', function (err, data) {
+        var html = data.toString();
+
+        if (req.session.user == null){
+            html = html.replace('<%LHYPER%>', "login");
+            html = html.replace('<%LTEXT%>', "LOGIN");
+        }
+        else {
+            html = html.replace('<%LHYPER%>', "home");
+            html = html.replace('<%LTEXT%>', "ACCOUNT");
+        }
+
         res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(data);
+        res.end(html);
     });
 });
 
 app.get('/forecasting', function (req, res) {
-    fs.readFile('public/pages/forecasting.html', function (err, data) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(data);
-    });
+
+
+    if (req.session.user == null){
+        res.redirect('/login');
+    } else {
+        fs.readFile('public/pages/forecasting.html', function (err, data) {
+            var html = data.toString();
+            html = html.replace('<%LHYPER%>', "home");
+            html = html.replace('<%LTEXT%>', "ACCOUNT");
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.end(html);
+        });
+    }
 });
 
-app.get('/login', function (req, res) {
-    fs.readFile('public/pages/login.html', function (err, data) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end(data);
-    });
-});
+// app.get('/login', function (req, res) {
+//     fs.readFile('public/pages/login.html', function (err, data) {
+//         res.writeHead(200, {'Content-Type': 'text/html'});
+//         res.end(data);
+//     });
+// });
 
 app.get('/stock', function (req, res) {
     // console.log(req.query);
-    code = req.query.code;
-    Stock.findOne({_id: code }, function(err, stock){
-        if(err) console.log(err);
-        fs.readFile('public/pages/stock.html', function (err, data) {
-            // Extract some data from my website
-            scrape("http://finance.naver.com/item/main.nhn?code=" + code, {
-                // Get the website title (from the top header)
-                title: ".blind dd"
-            }, (err, scrap) => {
-                var str = scrap.title.replace(/[^0-9 ]/g,'');
-                var dataArray = str.split(' ');
 
-                for(var i = 0; i < dataArray.length; ++i)
-                    if (dataArray[i] == '') dataArray.splice(i--,1);
+    if (req.session.user == null){
+        res.redirect('/login');
+    } else {
+        code = req.query.code;
 
-                var subDataSet = {
-                    currentPrice: addCommas(dataArray[6]),
-                    previousPrice: addCommas(dataArray[9]),
-                    marketPrice: addCommas(dataArray[10]),
-                    highPrice: addCommas(dataArray[11]),
-                    maximumPrice: addCommas(dataArray[12]),
-                    lowPrice: addCommas(dataArray[13]),
-                    minimumPrice: addCommas(dataArray[14]),
-                    volume: addCommas(dataArray[15]),
-                    tradeCost: addCommas(dataArray[16])
-                };
+        Corp.findOne({_id: code}, function (err, corp) {
 
-                //console.log(subDataSet);
-                var html = data.toString();
-                html = html.replace('<%CNAME%>',stock.stockName);
-                html = html.replace('<%CURRENTPRICE%>',subDataSet.currentPrice);
-                html = html.replace('<%PREVIOUSPRICE%>',subDataSet.previousPrice);
-                html = html.replace('<%MARKETPRICE%>',subDataSet.marketPrice);
-                html = html.replace('<%HIGHPRICE%>',subDataSet.highPrice);
-                html = html.replace('<%LOWPRICE%>',subDataSet.lowPrice);
-                html = html.replace('<%VOLUME%>',subDataSet.volume);
-                html = html.replace('<%TRADECOST%>',subDataSet.tradeCost);
+            if (err) console.log(err);
+            fs.readFile('public/pages/stock.html', function (err, data) {
+                // Extract some data from my website
+                scrape("http://finance.naver.com/item/main.nhn?code=" + code, {
+                    // Get the website title (from the top header)
+                    title: ".blind dd"
+                }, (err, scrap) => {
+                    try {
+                        if (typeof scrap.title === "undefined")
+                            res.end(errorHandleHtml);
+                        var str = scrap.title.replace(/[^0-9 ]/g, '');
+                        var dataArray = str.split(' ');
+
+                        for (var i = 0; i < dataArray.length; ++i)
+                            if (dataArray[i] == '') dataArray.splice(i--, 1);
 
 
-                //console.log(html);
-                res.end(html);
+                        var subDataSet = {
+                            currentPrice: addCommas(dataArray[6]),
+                            previousPrice: addCommas(dataArray[9]),
+                            marketPrice: addCommas(dataArray[10]),
+                            highPrice: addCommas(dataArray[11]),
+                            maximumPrice: addCommas(dataArray[12]),
+                            lowPrice: addCommas(dataArray[13]),
+                            minimumPrice: addCommas(dataArray[14]),
+                            volume: addCommas(dataArray[15]),
+                            tradeCost: addCommas(dataArray[16])
+                        };
+
+
+                        var gap = Number(dataArray[6]) - Number(dataArray[9]);
+                        //console.log(subDataSet);
+
+                        var priceArray = [];
+
+
+                        var html = data.toString();
+
+                        html = html.replace('<%CNAME%>', corp.name);
+                        html = html.replace('<%GAP%>', gap);
+                        html = html.replace('<%CURRENTPRICE%>', subDataSet.currentPrice);
+                        html = html.replace('<%PREVIOUSPRICE%>', subDataSet.previousPrice);
+                        html = html.replace('<%MARKETPRICE%>', subDataSet.marketPrice);
+                        html = html.replace('<%HIGHPRICE%>', subDataSet.highPrice);
+                        html = html.replace('<%LOWPRICE%>', subDataSet.lowPrice);
+                        html = html.replace('<%VOLUME%>', subDataSet.volume);
+                        html = html.replace('<%TRADECOST%>', subDataSet.tradeCost);
+
+                        html = html.replace('<%LHYPER%>', "home");
+                        html = html.replace('<%LTEXT%>', "ACCOUNT");
+                        html = html.replace('<%CODE%>', code);
+
+                    }
+                    catch (e) {
+                        console.log(e);
+                    }
+
+
+                    //console.log(html);
+                    res.end(html);
+                });
+                //res.writeHead(200, {'Content-Type': 'text/html'});
+                //console.log(data.toString());
             });
-            //res.writeHead(200, {'Content-Type': 'text/html'});
-            //console.log(data.toString());
         });
-    });
+    }
 });
 
 
-//
-// app.get('/insert', function (req, res) {
-//   req.query.seq = Number(req.query.seq);
-//   req.query.value = Number(req.query.value);
-//   res.send(req.query); // check data
-//   console.log("Get data !!\n" + JSON.stringify(req.query));
-// })
+app.get('/list', function (req, res) {
+    if (req.session.user == null){
+        res.redirect('/login');
+    }
+    else {
+        fs.readFile('public/pages/list.html', function (err, data) {
+            var kospi = "", kosdaq = "";
+            var html = data.toString();
+            DataStock.find(function (err, stock) {
+                forEach(range(0, stock.length), function (item, index, arr) {
+                    kospi += "<tr>";
+                    kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
+                        + stock[item]._id + "\">" + stock[item].name + "</a></td>";
+                    kospi += "<td>" + addCommas(stock[item].preDate.amount.toString()) + "</td>";
+                    kospi += "<td>" + addCommas(stock[item].preDate.close.toString()) + "</td>";
+                    kospi += "<td>" + addCommas(stock[item].preDate.high.toString()) + "</td>";
+                    kospi += "<td>" + addCommas(stock[item].preDate.low.toString()) + "</td>";
+                    kospi += "</tr>";
+                    if (item == 99) {
+                        html = html.replace('<%KOSPI%>', kospi);
+                        html = html.replace('<%LHYPER%>', "home");
+                        html = html.replace('<%LTEXT%>', "ACCOUNT");
+                        res.end(html);
+                    }
+
+                });
+            }).limit(100);
+        });
+    }
+});
+
+
+
+app.get('/mylist', function (req, res) {
+    if (req.session.user == null){
+        res.redirect('/login');
+    }
+    else {
+        fs.readFile('public/pages/mylist.html', function (err, data) {
+            Users.findOne({name: req.session.user.name}, function (err, user) {
+                var kospi = "", kosdaq = "";
+                var html = data.toString();
+                // console.log(user.interested.length);
+                forEach(range(0, user.interested.length), function (item, index, arr) {
+                    DataStock.findOne({_id: user.interested[item]}, function (err, stock) {
+
+                        kospi += "<tr>";
+                        kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
+                            + stock._id + "\">" + stock.name + "</a></td>";
+                        kospi += "<td>" + addCommas(stock.preDate.amount.toString()) + "</td>";
+                        kospi += "<td>" + addCommas(stock.preDate.close.toString()) + "</td>";
+                        kospi += "<td>" + addCommas(stock.preDate.high.toString()) + "</td>";
+                        kospi += "<td>" + addCommas(stock.preDate.low.toString()) + "</td>";
+                        kospi += "</tr>";
+                        if (item == user.interested.length - 1) {
+                            html = html.replace('<%KOSPI%>', kospi);
+                            html = html.replace('<%LHYPER%>', "home");
+                            html = html.replace('<%LTEXT%>', "ACCOUNT");
+                            res.end(html);
+                        }
+                    });
+
+                });
+                if(user.interested.length == 0) {
+                    html = html.replace('<%KOSPI%>', kospi);
+                    html = html.replace('<%LHYPER%>', "home");
+                    html = html.replace('<%LTEXT%>', "ACCOUNT");
+                    res.end(html);
+                }
+            });
+        });
+    }
+});
+
+
+app.get('/insert', function (req, res) {
+    if (req.session.user == null){
+        res.redirect('/login');
+    }
+    else {
+        Users.update({name: req.session.user.name}, {$push: {interested:req.query.code}}, function (err, user) {
+            if(err) console.log(err);
+            res.redirect('/mylist');
+        });
+    }
+});
+
+
+
+// forEach(range(0,100), function(item, index, arr) {
+//     console.log("each", item);
+// });
+
+function range(start, count) {
+    return Array.apply(0, Array(count))
+        .map(function (element, index) {
+            return index + start;
+        });
+}
 
 
 
