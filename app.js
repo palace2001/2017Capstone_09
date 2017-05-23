@@ -66,6 +66,7 @@ require('./router/routes')(app);
 app.use(express.static('public'));
 
 
+
 app.get('/', function (req, res) {
     fs.readFile('public/pages/main.html', function (err, data) {
         var html = data.toString();
@@ -261,6 +262,8 @@ app.get('/list', function (req, res) {
             var kospi = "", kosdaq = "";
             var html = data.toString();
             DataStock.find(function (err, stock) {
+                console.log(stock.length);
+                var count = 0;
                 forEach(range(0, stock.length), function (item, index, arr) {
                     var pSize = stock[item].pastPrice.length;
                     kospi += "<tr>";
@@ -283,7 +286,8 @@ app.get('/list', function (req, res) {
                     kospi += "<td>" + addCommas(stock[item].preDate.low.toString()) + "</td>";
                     kospi += "<td>" + addCommas(stock[item].preDate.amount.toString()) + "</td>";
                     kospi += "</tr>";
-                    if (item == 99) {
+                    count++;
+                    if (count == 101) {
                         html = html.replace('<%KOSPI%>', kospi);
                         html = html.replace('<%LHYPER%>', "home");
                         html = html.replace('<%LTEXT%>', "ACCOUNT");
@@ -291,7 +295,7 @@ app.get('/list', function (req, res) {
                     }
 
                 });
-            }).limit(100);
+            });
         });
     }
 });
@@ -307,27 +311,42 @@ app.get('/mylist', function (req, res) {
             Users.findOne({name: req.session.user.name}, function (err, user) {
                 var kospi = "", kosdaq = "";
                 var html = data.toString();
-                console.log(user.interested.length);
+                var count = 0;
                 forEach(range(0, user.interested.length), function (item, index, arr) {
                     DataStock.findOne({_id: user.interested[item]}, function (err, stock) {
-                        console.log(stock.name + item);
+                        var pSize = stock.pastPrice.length;
+                        // console.log(stock.name + item);
                         kospi += "<tr>";
                         kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
                             + stock._id + "\">" + stock.name + "</a></td>";
+                        var num = -1000;
+                        kospi += "<td style=\"color:red\">" + addCommas(num.toString()) + "</td>";
                         kospi += "<td>" + addCommas(stock.preDate.close.toString()) + "</td>";
+                        var gap = stock.preDate.close - stock.pastPrice[pSize-2];
+                        //console.log(stock[item].pastPrice);
+                        if (gap > 0){
+                            kospi += "<td style=\"color:red\">" + '▲' + addCommas(gap.toString()) + "</td>";
+                        } else if(gap < 0) {
+                            kospi += "<td style=\"color:blue\">" + '▼' + addCommas((gap*-1).toString()) + "</td>";
+                        } else {
+                            kospi += "<td>" + addCommas(gap.toString()) + "</td>";
+                        }
                         kospi += "<td>" + addCommas(stock.preDate.high.toString()) + "</td>";
                         kospi += "<td>" + addCommas(stock.preDate.low.toString()) + "</td>";
                         kospi += "<td>" + addCommas(stock.preDate.amount.toString()) + "</td>";
+                        kospi += "<td align=\'center\'>" +
+                            "<form action=\"http://203.246.113.178:3000/delete\" method=\"GET\">" +
+                            "<input type=\"hidden\" name=\"code\" value=\"" + stock._id + "\" />" +
+                            "<input type=\"submit\" value=\"↺\" />" + "</form></td>";
                         kospi += "</tr>";
-                        if (item == user.interested.length - 1) {
+                        count++;
+                        if (count == user.interested.length) {
                             html = html.replace('<%KOSPI%>', kospi);
                             html = html.replace('<%LHYPER%>', "home");
                             html = html.replace('<%LTEXT%>', "ACCOUNT");
-                            console.log("send over" + item);
                             res.end(html);
                         }
                     });
-
                 });
                 if(user.interested.length == 0) {
                     html = html.replace('<%KOSPI%>', kospi);
@@ -339,6 +358,8 @@ app.get('/mylist', function (req, res) {
         });
     }
 });
+
+
 
 
 app.get('/insert', function (req, res) {
@@ -355,6 +376,73 @@ app.get('/insert', function (req, res) {
 
 
 
+app.get('/delete', function (req, res) {
+    if (req.session.user == null){
+        res.redirect('/login');
+    }
+    else {
+
+        Users.update({name: req.session.user.name}, {$pull: {interested:req.query.code}}, function (err, user) {
+            if(err) console.log(err);
+            console.log(req.query);
+            res.redirect('/mylist');
+        });
+    }
+});
+
+
+
+
+app.get('/config', function (req, res) {
+    if (req.session.user.name != "master"){
+        res.end('Only Access Master');
+    } else {
+        fs.readFile('public/pages/config.html', function (err, data) {
+            var html = data.toString();
+            var userList = "";
+            var count = 0;
+            Users.find( function (err, users) {
+                forEach(range(0, users.length), function (i, index, arr) {
+                    count++;
+                    if (users[i].name != "master") {
+                        userList += "<tr>";
+                        userList += "<td>" + i + "</td>";
+                        userList += "<td>" + users[i].name + "</td>";
+                        userList += "<td>" + users[i].email + "</td>";
+                        userList += "<td align=\'center\'>" +
+                            "<form action=\"http://203.246.113.178:3000/duser\" method=\"GET\">" +
+                            "<input type=\"hidden\" name=\"code\" value=\"" + users[i].name + "\" />" +
+                            "<input type=\"submit\" value=\"↺\" />" + "</form></td>";
+                        userList += "</tr>";
+                    }
+
+                    if (count == users.length) {
+                        html = html.replace('<%USERS%>', userList);
+                        res.end(html);
+                    }
+                });
+            });
+        });
+    }
+});
+
+
+app.get('/duser', function (req, res) {
+    if (req.session.user.name != "master"){
+        res.end('Only Access Master');
+    }
+    else {
+        Users.remove({name: req.query.code}, function (err, user) {
+            if(err) console.log(err);
+            console.log("Master kill the " + req.query.code);
+            res.redirect('/config');
+        });
+    }
+});
+
+
+
+//
 // forEach(range(0,100), function(item, index, arr) {
 //     console.log("each", item);
 // });

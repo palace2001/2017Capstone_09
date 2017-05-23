@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> <!-- IE 호환모드방지 -->
-	<title>Goodluck</title>
+	<title>CONFIG_USER_PAGE</title>
 
 	<!-- css -->
 	<link href="stylesheets/jieun_css.css" rel="stylesheet" media="all" type="text/css">
@@ -27,58 +27,25 @@
 
 		<div class="navright">
 			<li><a href="http://203.246.113.178:3000">HOME</a></li>
-			<li><a href="http://203.246.113.178:3000/about">ABOUT</a></li>
-			<li><a href="http://203.246.113.178:3000/forecasting">FORECASTING</a></li>
-			<li><a href="http://203.246.113.178:3000/<%LHYPER%>"><%LTEXT%></a></li>
 		</div>
 	</div>
 </nav>
 
 <div class="contain_list" style="margin-top: 50px">
 
-	<div class="subtitle">KOSPI List</div><br>
+	<div class="subtitle">User List</div><br>
 	<table class="mytable">
 		<tr>
-			<th>종목명</th>
-			<th>예측가</th>
-			<th>시가</th>
-			<th>전일대비</th>
-			<th>고가</th>
-			<th>저가</th>
-			<th>거래량</th>
-			<th>삭제</th>
+			<th>Number</th>
+			<th>Name</th>
+			<th>E-mail</th>
+			<th>Expel</th>
 		</tr>
-
-		<!--<tr>-->
-		<!--<td><a href="http://203.246.113.178:3000/stock?code=005930">삼성전자</a></td>-->
-		<!--<td>2,000</td>-->
-		<!--<td>2,282,000</td>-->
-		<!--<td>1,000</td>-->
-		<!--<td>2,289,000</td>-->
-		<!--<td>2,236,000</td>-->
-		<!--<td>314,478</td>-->
-		<!--</tr>-->
-
-		<%KOSPI%>
+		<%USERS%>
 	</table>
 
 	<br><br><br>
-	<div class="subtitle">KOSDAQ List</div><br>
-	<table class="mytable">
-		<tr>
-			<th>종목명</th>
-			<th>예측가</th>
-			<th>시가</th>
-			<th>전일대비</th>
-			<th>고가</th>
-			<th>저가</th>
-			<th>거래량</th>
-			<th>삭제</th>
-		</tr>
 
-		<%KOSDAQ%>
-
-	</table>
 
 </div>
 
