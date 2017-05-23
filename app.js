@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 // var Data = require('./public/javascripts/data');
 var DataStock = require('./public/javascripts/dataStock');
 var Users = require('./public/javascripts/user');
+var Factor = require('./public/javascripts/factor');
 var passport = require('passport');
 var session = require('express-session');
 
@@ -69,6 +70,7 @@ app.get('/', function (req, res) {
     fs.readFile('public/pages/main.html', function (err, data) {
         var html = data.toString();
 
+
         if (req.session.user == null){
             html = html.replace('<%LHYPER%>', "login");
             html = html.replace('<%LTEXT%>', "LOGIN");
@@ -104,16 +106,31 @@ app.get('/about', function (req, res) {
 
 app.get('/forecasting', function (req, res) {
 
-
     if (req.session.user == null){
         res.redirect('/login');
     } else {
         fs.readFile('public/pages/forecasting.html', function (err, data) {
-            var html = data.toString();
-            html = html.replace('<%LHYPER%>', "home");
-            html = html.replace('<%LTEXT%>', "ACCOUNT");
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.end(html);
+            Factor.findOne({_id: "001"}, function (err, pdata) {
+                Factor.findOne({_id: "101"}, function (err, ddata) {
+                    var html = data.toString();
+                    var pValue = [], dValue = [];
+
+                    forEach(range(0, pdata.value.length), function (i, index, arr) {
+
+                        pValue.push([i,pdata.value[i].value/100]);
+                        dValue.push([i,ddata.value[i].value/100]);
+
+                        if(i == pdata.value.length - 1) {
+                            html = html.replace('<%PVALUE%>',JSON.stringify(pValue));
+                            html = html.replace('<%DVALUE%>',JSON.stringify(dValue));
+                            html = html.replace('<%LHYPER%>', "home");
+                            html = html.replace('<%LTEXT%>', "ACCOUNT");
+                            res.writeHead(200, {'Content-Type': 'text/html'});
+                            res.end(html);
+                        }
+                    });
+                });
+            });
         });
     }
 });
@@ -133,8 +150,7 @@ app.get('/stock', function (req, res) {
     } else {
         code = req.query.code;
 
-        Corp.findOne({_id: code}, function (err, corp) {
-
+        DataStock.findOne({_id: code}, function (err, corp) {
             if (err) console.log(err);
             fs.readFile('public/pages/stock.html', function (err, data) {
                 // Extract some data from my website
@@ -144,7 +160,7 @@ app.get('/stock', function (req, res) {
                 }, (err, scrap) => {
                     try {
                         if (typeof scrap.title === "undefined")
-                            res.end(errorHandleHtml);
+                            res.redirect('/stock?code=' + code);
                         var str = scrap.title.replace(/[^0-9 ]/g, '');
                         var dataArray = str.split(' ');
 
@@ -152,8 +168,27 @@ app.get('/stock', function (req, res) {
                             if (dataArray[i] == '') dataArray.splice(i--, 1);
 
 
+                        var html = data.toString();
+
+                        var gap = Number(dataArray[6]) - Number(dataArray[9]);
+                        var rStr = "";
+                        if(gap > 0) {
+                            rStr = '▲' + addCommas(gap);
+                            html = html.replace('<%COLOR1%>','red');
+                            html = html.replace('<%COLOR2%>','red');
+                        } else if(gap < 0) {
+                            rStr = '▼' + addCommas(gap*-1);
+                            html = html.replace('<%COLOR1%>','blue');
+                            html = html.replace('<%COLOR2%>','blue');
+                        } else {
+                            rStr = addCommas(gap);
+                            html = html.replace('<%COLOR1%>','bold');
+                            html = html.replace('<%COLOR2%>','bold');
+                        }
                         var subDataSet = {
                             currentPrice: addCommas(dataArray[6]),
+                            gapPrice: rStr,
+                            rate: addCommas(Number(dataArray[8])/100),
                             previousPrice: addCommas(dataArray[9]),
                             marketPrice: addCommas(dataArray[10]),
                             highPrice: addCommas(dataArray[11]),
@@ -165,36 +200,49 @@ app.get('/stock', function (req, res) {
                         };
 
 
-                        var gap = Number(dataArray[6]) - Number(dataArray[9]);
+                        var priceArray = [];
+                        forEach(range(0, corp.pastPrice.length), function (i, index, arr) {
+                            priceArray.push([i, corp.pastPrice[i]]);
+                            // priceArray.push([i, corp.pastPrice[i], corp.forecastPrice[i]]);
+
+                            if(i == corp.pastPrice.length - 1) {
+
+
+                                html = html.replace('<%DATA%>', JSON.stringify(priceArray));
+                                html = html.replace('<%CNAME%>', corp.name);
+                                html = html.replace('<%GAP%>', subDataSet.gapPrice);
+                                html = html.replace('<%RATE%>', subDataSet.rate);
+                                html = html.replace('<%CURRENTPRICE%>', subDataSet.currentPrice);
+                                html = html.replace('<%PREVIOUSPRICE%>', subDataSet.previousPrice);
+                                html = html.replace('<%MARKETPRICE%>', subDataSet.marketPrice);
+                                html = html.replace('<%HIGHPRICE%>', subDataSet.highPrice);
+                                html = html.replace('<%LOWPRICE%>', subDataSet.lowPrice);
+                                html = html.replace('<%VOLUME%>', subDataSet.volume);
+                                html = html.replace('<%TRADECOST%>', subDataSet.tradeCost);
+
+                                html = html.replace('<%LHYPER%>', "home");
+                                html = html.replace('<%LTEXT%>', "ACCOUNT");
+                                html = html.replace('<%CODE%>', code);
+
+                                res.end(html);
+                            }
+                        });
+
+
+
                         //console.log(subDataSet);
 
-                        var priceArray = [];
 
 
-                        var html = data.toString();
 
-                        html = html.replace('<%CNAME%>', corp.name);
-                        html = html.replace('<%GAP%>', gap);
-                        html = html.replace('<%CURRENTPRICE%>', subDataSet.currentPrice);
-                        html = html.replace('<%PREVIOUSPRICE%>', subDataSet.previousPrice);
-                        html = html.replace('<%MARKETPRICE%>', subDataSet.marketPrice);
-                        html = html.replace('<%HIGHPRICE%>', subDataSet.highPrice);
-                        html = html.replace('<%LOWPRICE%>', subDataSet.lowPrice);
-                        html = html.replace('<%VOLUME%>', subDataSet.volume);
-                        html = html.replace('<%TRADECOST%>', subDataSet.tradeCost);
 
-                        html = html.replace('<%LHYPER%>', "home");
-                        html = html.replace('<%LTEXT%>', "ACCOUNT");
-                        html = html.replace('<%CODE%>', code);
 
                     }
                     catch (e) {
                         console.log(e);
                     }
-
-
                     //console.log(html);
-                    res.end(html);
+
                 });
                 //res.writeHead(200, {'Content-Type': 'text/html'});
                 //console.log(data.toString());
@@ -214,13 +262,26 @@ app.get('/list', function (req, res) {
             var html = data.toString();
             DataStock.find(function (err, stock) {
                 forEach(range(0, stock.length), function (item, index, arr) {
+                    var pSize = stock[item].pastPrice.length;
                     kospi += "<tr>";
                     kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
                         + stock[item]._id + "\">" + stock[item].name + "</a></td>";
-                    kospi += "<td>" + addCommas(stock[item].preDate.amount.toString()) + "</td>";
+                    var num = -1000;
+                    kospi += "<td style=\"color:red\">" + addCommas(num.toString()) + "</td>";
                     kospi += "<td>" + addCommas(stock[item].preDate.close.toString()) + "</td>";
+
+                    var gap = stock[item].preDate.close - stock[item].pastPrice[pSize-2];
+                    //console.log(stock[item].pastPrice);
+                    if (gap > 0){
+                        kospi += "<td style=\"color:red\">" + '▲' + addCommas(gap.toString()) + "</td>";
+                    } else if(gap < 0) {
+                        kospi += "<td style=\"color:blue\">" + '▼' + addCommas((gap*-1).toString()) + "</td>";
+                    } else {
+                        kospi += "<td>" + addCommas(gap.toString()) + "</td>";
+                    }
                     kospi += "<td>" + addCommas(stock[item].preDate.high.toString()) + "</td>";
                     kospi += "<td>" + addCommas(stock[item].preDate.low.toString()) + "</td>";
+                    kospi += "<td>" + addCommas(stock[item].preDate.amount.toString()) + "</td>";
                     kospi += "</tr>";
                     if (item == 99) {
                         html = html.replace('<%KOSPI%>', kospi);
@@ -246,22 +307,23 @@ app.get('/mylist', function (req, res) {
             Users.findOne({name: req.session.user.name}, function (err, user) {
                 var kospi = "", kosdaq = "";
                 var html = data.toString();
-                // console.log(user.interested.length);
+                console.log(user.interested.length);
                 forEach(range(0, user.interested.length), function (item, index, arr) {
                     DataStock.findOne({_id: user.interested[item]}, function (err, stock) {
-
+                        console.log(stock.name + item);
                         kospi += "<tr>";
                         kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
                             + stock._id + "\">" + stock.name + "</a></td>";
-                        kospi += "<td>" + addCommas(stock.preDate.amount.toString()) + "</td>";
                         kospi += "<td>" + addCommas(stock.preDate.close.toString()) + "</td>";
                         kospi += "<td>" + addCommas(stock.preDate.high.toString()) + "</td>";
                         kospi += "<td>" + addCommas(stock.preDate.low.toString()) + "</td>";
+                        kospi += "<td>" + addCommas(stock.preDate.amount.toString()) + "</td>";
                         kospi += "</tr>";
                         if (item == user.interested.length - 1) {
                             html = html.replace('<%KOSPI%>', kospi);
                             html = html.replace('<%LHYPER%>', "home");
                             html = html.replace('<%LTEXT%>', "ACCOUNT");
+                            console.log("send over" + item);
                             res.end(html);
                         }
                     });
