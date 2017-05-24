@@ -118,8 +118,8 @@ app.get('/forecasting', function (req, res) {
 
                     forEach(range(0, pdata.value.length), function (i, index, arr) {
 
-                        pValue.push([i,pdata.value[i].value/100]);
-                        dValue.push([i,ddata.value[i].value/100]);
+                        pValue.push([pdata.value[i].date.toString(), pdata.value[i].value/100]);
+                        dValue.push([ddata.value[i].date.toString(), ddata.value[i].value/100]);
 
                         if(i == pdata.value.length - 1) {
                             html = html.replace('<%PVALUE%>',JSON.stringify(pValue));
@@ -173,6 +173,9 @@ app.get('/stock', function (req, res) {
 
                         var gap = Number(dataArray[6]) - Number(dataArray[9]);
                         var rStr = "";
+                        var predict = corp.predict.value - corp.preDate.close;
+                        var pStr = "";
+
                         if(gap > 0) {
                             rStr = '▲' + addCommas(gap);
                             html = html.replace('<%COLOR1%>','red');
@@ -186,9 +189,22 @@ app.get('/stock', function (req, res) {
                             html = html.replace('<%COLOR1%>','bold');
                             html = html.replace('<%COLOR2%>','bold');
                         }
+
+                        if(predict > 0) {
+                            pStr = '▲' + addCommas(predict);
+                            html = html.replace('<%COLOR3%>','red');
+                        } else if(predict < 0) {
+                            pStr = '▼' + addCommas(predict*-1);
+                            html = html.replace('<%COLOR3%>','blue');
+                        } else {
+                            pStr = addCommas(predict);
+                            html = html.replace('<%COLOR3%>','bold');
+                        }
+
                         var subDataSet = {
                             currentPrice: addCommas(dataArray[6]),
                             gapPrice: rStr,
+                            predict: pStr,
                             rate: addCommas(Number(dataArray[8])/100),
                             previousPrice: addCommas(dataArray[9]),
                             marketPrice: addCommas(dataArray[10]),
@@ -203,40 +219,48 @@ app.get('/stock', function (req, res) {
 
                         var priceArray = [];
                         forEach(range(0, corp.pastPrice.length), function (i, index, arr) {
-                            priceArray.push([i, corp.pastPrice[i]]);
-                            // priceArray.push([i, corp.pastPrice[i], corp.forecastPrice[i]]);
+                            // priceArray.push([i, corp.pastPrice[corp.pastPrice.length - i + 1]]);
+                            // console.log(corp.pastPrice[corp.pastPrice.length - (i + 1)]);
+                            priceArray.push([i, corp.pastPrice[corp.pastPrice.length - (i + 1)].value,
+                                corp.forecastPrice[corp.pastPrice.length - (i + 1)].value]);
 
                             if(i == corp.pastPrice.length - 1) {
+                                // console.log(randomRange(0, 98));
 
+                                DataStock.find(function (err, stock1) {
+                                    DataStock.find(function (err, stock2) {
+                                        console.log(stock1[0]._id);
+                                        var relative = "<a href=\"http://203.246.113.178:3000/stock?code=" + stock1[0]._id
+                                            + "\">" + stock1[0].name + "</a>" + "    /   "
+                                            + "<a href=\"http://203.246.113.178:3000/stock?code=" + stock2[0]._id
+                                            + "\">" +  stock2[0].name  + "</a >";
 
-                                html = html.replace('<%DATA%>', JSON.stringify(priceArray));
-                                html = html.replace('<%CNAME%>', corp.name);
-                                html = html.replace('<%GAP%>', subDataSet.gapPrice);
-                                html = html.replace('<%RATE%>', subDataSet.rate);
-                                html = html.replace('<%CURRENTPRICE%>', subDataSet.currentPrice);
-                                html = html.replace('<%PREVIOUSPRICE%>', subDataSet.previousPrice);
-                                html = html.replace('<%MARKETPRICE%>', subDataSet.marketPrice);
-                                html = html.replace('<%HIGHPRICE%>', subDataSet.highPrice);
-                                html = html.replace('<%LOWPRICE%>', subDataSet.lowPrice);
-                                html = html.replace('<%VOLUME%>', subDataSet.volume);
-                                html = html.replace('<%TRADECOST%>', subDataSet.tradeCost);
+                                        html = html.replace('<%DATA%>', JSON.stringify(priceArray));
+                                        html = html.replace('<%CNAME%>', corp.name);
+                                        html = html.replace('<%GAP%>', subDataSet.gapPrice);
+                                        html = html.replace('<%RATE%>', subDataSet.rate);
+                                        html = html.replace('<%CURRENTPRICE%>', subDataSet.currentPrice);
+                                        html = html.replace('<%PREVIOUSPRICE%>', subDataSet.previousPrice);
+                                        html = html.replace('<%MARKETPRICE%>', subDataSet.marketPrice);
+                                        html = html.replace('<%HIGHPRICE%>', subDataSet.highPrice);
+                                        html = html.replace('<%LOWPRICE%>', subDataSet.lowPrice);
+                                        html = html.replace('<%VOLUME%>', subDataSet.volume);
+                                        html = html.replace('<%TRADECOST%>', subDataSet.tradeCost);
+                                        html = html.replace('<%PREDICT%>', subDataSet.predict);
+                                        html = html.replace('<%LHYPER%>', "home");
+                                        html = html.replace('<%LTEXT%>', "ACCOUNT");
+                                        html = html.replace('<%CODE%>', code);
+                                        html = html.replace('<%RELATIVE%>',relative);
+                                        res.end(html);
+                                    }).limit(1).skip(randomRange(0, 98));
+                                }).limit(1).skip(randomRange(0, 98));
 
-                                html = html.replace('<%LHYPER%>', "home");
-                                html = html.replace('<%LTEXT%>', "ACCOUNT");
-                                html = html.replace('<%CODE%>', code);
-
-                                res.end(html);
                             }
                         });
 
 
 
                         //console.log(subDataSet);
-
-
-
-
-
 
                     }
                     catch (e) {
@@ -262,18 +286,25 @@ app.get('/list', function (req, res) {
             var kospi = "", kosdaq = "";
             var html = data.toString();
             DataStock.find(function (err, stock) {
-                console.log(stock.length);
                 var count = 0;
                 forEach(range(0, stock.length), function (item, index, arr) {
                     var pSize = stock[item].pastPrice.length;
                     kospi += "<tr>";
                     kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
                         + stock[item]._id + "\">" + stock[item].name + "</a></td>";
-                    var num = -1000;
-                    kospi += "<td style=\"color:red\">" + addCommas(num.toString()) + "</td>";
+                    var predict = stock[item].predict.value - stock[item].preDate.close;
+                    //console.log(stock[item].pastPrice);
+                    if (predict > 0){
+                        kospi += "<td style=\"color:red\">" + '▲' + addCommas(predict.toString()) + "</td>";
+                    } else if(predict < 0) {
+                        kospi += "<td style=\"color:blue\">" + '▼' + addCommas((predict*-1).toString()) + "</td>";
+                    } else {
+                        kospi += "<td>" + addCommas(predict.toString()) + "</td>";
+                    }
+
                     kospi += "<td>" + addCommas(stock[item].preDate.close.toString()) + "</td>";
 
-                    var gap = stock[item].preDate.close - stock[item].pastPrice[pSize-2];
+                    var gap = stock[item].preDate.close - stock[item].pastPrice[pSize-2].value;
                     //console.log(stock[item].pastPrice);
                     if (gap > 0){
                         kospi += "<td style=\"color:red\">" + '▲' + addCommas(gap.toString()) + "</td>";
@@ -287,7 +318,7 @@ app.get('/list', function (req, res) {
                     kospi += "<td>" + addCommas(stock[item].preDate.amount.toString()) + "</td>";
                     kospi += "</tr>";
                     count++;
-                    if (count == 101) {
+                    if (count == stock.length - 1) {
                         html = html.replace('<%KOSPI%>', kospi);
                         html = html.replace('<%LHYPER%>', "home");
                         html = html.replace('<%LTEXT%>', "ACCOUNT");
@@ -312,17 +343,27 @@ app.get('/mylist', function (req, res) {
                 var kospi = "", kosdaq = "";
                 var html = data.toString();
                 var count = 0;
+                console.log(user.interested.length);
                 forEach(range(0, user.interested.length), function (item, index, arr) {
                     DataStock.findOne({_id: user.interested[item]}, function (err, stock) {
+                        //console.log(stock);
                         var pSize = stock.pastPrice.length;
                         // console.log(stock.name + item);
                         kospi += "<tr>";
                         kospi += "<td><a href=\"http://203.246.113.178:3000/stock?code="
                             + stock._id + "\">" + stock.name + "</a></td>";
-                        var num = -1000;
-                        kospi += "<td style=\"color:red\">" + addCommas(num.toString()) + "</td>";
+                        var predict = stock.predict.value - stock.preDate.close;
+                        //console.log(stock[item].pastPrice);
+                        if (predict > 0){
+                            kospi += "<td style=\"color:red\">" + '▲' + addCommas(predict.toString()) + "</td>";
+                        } else if(predict < 0) {
+                            kospi += "<td style=\"color:blue\">" + '▼' + addCommas((predict*-1).toString()) + "</td>";
+                        } else {
+                            kospi += "<td>" + addCommas(predict.toString()) + "</td>";
+                        }
+
                         kospi += "<td>" + addCommas(stock.preDate.close.toString()) + "</td>";
-                        var gap = stock.preDate.close - stock.pastPrice[pSize-2];
+                        var gap = stock.preDate.close - stock.pastPrice[pSize-2].value;
                         //console.log(stock[item].pastPrice);
                         if (gap > 0){
                             kospi += "<td style=\"color:red\">" + '▲' + addCommas(gap.toString()) + "</td>";
@@ -384,7 +425,6 @@ app.get('/delete', function (req, res) {
 
         Users.update({name: req.session.user.name}, {$pull: {interested:req.query.code}}, function (err, user) {
             if(err) console.log(err);
-            console.log(req.query);
             res.redirect('/mylist');
         });
     }
@@ -441,6 +481,20 @@ app.get('/duser', function (req, res) {
 });
 
 
+app.get('/search', function (req, res) {
+    if (req.session.user == null){
+        res.redirect('/login');
+    }
+    else {
+        DataStock.findOne({name: req.query.code}, function (err, stock) {
+            if(stock) res.redirect('/stock?code=' + stock._id);
+            else res.redirect('/forecasting')
+        });
+    }
+});
+
+
+
 
 //
 // forEach(range(0,100), function(item, index, arr) {
@@ -487,6 +541,13 @@ function addCommas(nStr) {
     }
     return x1 + x2;
 }
+
+// 지정된 범위의 정수 1개를 랜덤하게 반환하는 함수
+// n1 은 "하한값", n2 는 "상한값"
+function randomRange(n1, n2) {
+    return Math.floor( (Math.random() * (n2 - n1 + 1)) + n1 );
+}
+
 
 
 

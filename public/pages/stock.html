@@ -31,8 +31,14 @@
 
 	<!-- Main Contents -->
 	<div class="contents">
-		<span>
-			<h1><%CNAME%></h1><h5><a href="http://203.246.113.178:3000/insert?code=<%CODE%>">(+) 관심 종목 추가</a></h5><br>
+			<h1>
+				<%CNAME%>&nbsp&nbsp
+			<span class="black"><a href="http://203.246.113.178:3000/insert?code=<%CODE%>">(+) 관심종목추가</a></span><br>
+			</h1>
+			<br>
+
+			<h3>실시간 정보</h3>
+			<hr class="stockline">
 
 			<table border="0" class="detailtable">
 				<tr>
@@ -48,7 +54,8 @@
 				<tr>
 					<td><span class="bold">시가</span> <%MARKETPRICE%></td>
 					<td><span class="bold">저가</span> <%LOWPRICE%></td>
-					<td><span class="bold">거래대금</span> <%TRADECOST%> 백만</td>
+					<td><span class="<%COLOR3%>">예측가 <%PREDICT%></span> </td>
+					<!--<td><span class="bold">거래대금</span> <%TRADECOST%> 백만</td>-->
 				</tr>
 			</table>
 
@@ -57,10 +64,11 @@
 
 			<p>
 			<h2>관련 종목</h2>
-			<a href="">LG전자</a> / <a href="">안랩</a> / <a href="">한미약품</a> 
+			<%RELATIVE%>
+			<!--<a href="">LG전자</a>	/	<a href="">안랩</a>	/	<a href="">한미약품</a>-->
 			</p>
 
-		</span>
+		</h3>
 	</div>
 
 	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -83,7 +91,7 @@
 		var data = new google.visualization.DataTable();
 		data.addColumn('number', 'X');
 		data.addColumn('number', '실제결과');
-//		data.addColumn('number', '예측');
+		data.addColumn('number', '예측');
 
 //		data.addRows([
 //			[1, 2123000, 2022000], [2, 2120000, 2010000], [3, 2040000, 1900000], [4, 2074000, 2098000], [5, 2089000, 1990000], [6, 2099000, 2000000], [7, 2060000, 1990000], [8, 2070200, 2060000], [9, 2009200, 2018000], [10, 2080000, 2020000], [11, 2097000, 2030000], [12, 2080000, 2020000]

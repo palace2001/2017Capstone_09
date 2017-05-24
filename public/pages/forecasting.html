@@ -29,6 +29,19 @@
 	</nav>
 
 	<div class="contents">
+
+		<span>
+			<h1>종목 검색</h1>
+			<div style="text-align: center">
+				<br>
+				<input type="text" id="sText" style="border-left: 0 ; border-right: 0; border-top: 0" placeholder="종목 이름"/>
+				<input type="submit" id="sButton" onclick="searchButtonClicked();" value="검색"/>
+				<br><br>원하는 종목을 검색하면 예측 페이지로 이동합니다.
+			</div>
+		</span>
+
+		<hr class="kospiandkosdaq">
+
 		<span>
 			<h1>코스피</h1>
 			<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -40,20 +53,20 @@
 						<td colspan="2"><h2>하락세 예측 Top3</h2></td>
 					</tr>
 					<tr>
-						<td><a href="http://203.246.113.178:3000/stock?code=005930">삼성전자</a></td>
-						<td class="red">▲8,600</td>
-						<td>현대해상</td>
-						<td class="blue">▼4,600</td>
+						<td><a href="http://203.246.113.178:3000/stock?code=000100">유한양행</a></td>
+						<td class="red">▲1,325</td>
+						<td><a href="http://203.246.113.178:3000/stock?code=000240">한국타이어월드와이드</a></td>
+						<td class="blue">▼155</td>
 					</tr>
 					<tr>
-						<td>현대자동차</td>
-						<td class="red">▲2,360</td>
+						<td><a href="http://203.246.113.178:3000/stock?code=000150">두산</a></td>
+						<td class="red">▲2,574</td>
 						<td>LG전자</td>
 						<td class="blue">▼2,360</td>
 					</tr>
 					<tr>
-						<td>한미약품</td>
-						<td class="red">▲1,080</td>
+						<td><a href="http://203.246.113.178:3000/stock?code=000810">삼성화재</a></td>
+						<td class="red">▲828</td>
 						<td>하이트진로홀딩스</td>
 						<td class="blue">▼1,080</td>
 					</tr>
@@ -73,27 +86,27 @@
 						<td colspan="2"><h2>상승세 예측 Top3</h2></td>
 						<td colspan="2"><h2>하락세 예측 Top3</h2></td>	
 					</tr>
-					<tr>
-						<td>셀트리온</td>
-						<td class="red">▲1,600</td>
-						<td>카카오</td>
-						<td class="blue">▼7,600</td>
-					</tr>
-					<tr>
-						<td>메디톡스</td>
-						<td class="red">▲900</td>
-						<td>CJ오쇼핑</td>
-						<td class="blue">▼6,800</td>
-					</tr>
-					<tr>
-						<td>서울반도체</td>
-						<td class="red">▲300</td>
-						<td>리노공업</td>
-						<td class="blue">▼1,860</td>
-					</tr>
+					<!--<tr>-->
+						<!--<td>셀트리온</td>-->
+						<!--<td class="red">▲1,600</td>-->
+						<!--<td>카카오</td>-->
+						<!--<td class="blue">▼7,600</td>-->
+					<!--</tr>-->
+					<!--<tr>-->
+						<!--<td>메디톡스</td>-->
+						<!--<td class="red">▲900</td>-->
+						<!--<td>CJ오쇼핑</td>-->
+						<!--<td class="blue">▼6,800</td>-->
+					<!--</tr>-->
+					<!--<tr>-->
+						<!--<td>서울반도체</td>-->
+						<!--<td class="red">▲300</td>-->
+						<!--<td>리노공업</td>-->
+						<!--<td class="blue">▼1,860</td>-->
+					<!--</tr>-->
 				</table>
 			</div>
-			<a class="more" href="http://203.246.113.178:3000/list">(+) 전체보기</a>
+			<!--<a class="more" href="http://203.246.113.178:3000/list">(+) 전체보기</a>-->
 		</span>
 	</div>
 	<br><br><br><br><br><br><br>
@@ -111,6 +124,15 @@
 
 <script>
 
+
+	function searchButtonClicked() {
+        var txt = document.getElementById("sText").value;
+        if(txt == '') alert("종목을 입력하세요.");
+        else
+            location.href="http://203.246.113.178:3000/search?code=" + txt;
+    }
+
+
 </script>
 
 <script>
@@ -121,7 +143,7 @@
 	function drawKospi() {
 
 	      var data = new google.visualization.DataTable();
-	      data.addColumn('number', 'X');
+	      data.addColumn('string', 'X');
 	      data.addColumn('number', 'KOSPI');
 
 //	      data.addRows([
@@ -143,7 +165,7 @@
 
 	      var options = {
 	        hAxis: {
-	          title: 'Time'
+	          title: 'Date'
 	        },
 	        vAxis: {
 	          title: 'Price'
@@ -163,7 +185,7 @@
 	function drawKosdaq() {
 
 	      var data = new google.visualization.DataTable();
-	      data.addColumn('number', 'X');
+	      data.addColumn('string', 'X');
 	      data.addColumn('number', 'KOSDAQ');
 
 //	      data.addRows([
@@ -186,7 +208,7 @@
 
 	      var options = {
 	        hAxis: {
-	          title: 'Time'
+	          title: 'Date'
 	        },
 	        vAxis: {
 	          title: 'Price'

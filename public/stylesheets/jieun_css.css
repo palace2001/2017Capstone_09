@@ -33,6 +33,15 @@ a {
 	color: blue;
 	font-family: 'NanumSquareEB';		
 }
+.blue2 {
+	color: blue;
+	font-family: 'NanumSquareEB';
+	font-size: 17px;
+}
+.black {
+	font-family: 'NanumSquareEB';
+	font-size: 15px;
+}
 .bold {
 	font-family: 'NanumSquareB';
 }
@@ -75,7 +84,7 @@ a {
 }
 .navright {
 	margin-top: 20px;
-	width: 335px;
+	width: 375px;
 	float: right;
 }
 .btntransp {
@@ -208,6 +217,12 @@ footer a {
 	margin-top: 70px;
 	margin-bottom: 50px;
 }
+.stockline {
+	width: 100%;
+	color: #212121;
+	text-align: center;
+	border: solid 1px;
+}
 .top3table {
 	text-align: center;
 	width:600px;	
@@ -230,7 +245,6 @@ footer a {
 	margin-bottom: 0px;
 	border-bottom: 0px;
 }
-
 .subtitle {
 	font-size: 20px;
 	font-family: 'NanumSquareEB';

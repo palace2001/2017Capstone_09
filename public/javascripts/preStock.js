@@ -19,7 +19,6 @@ var Schema = mongoose.Schema;
 var stockSchema = mongoose.Schema({
     _id: String,
     name: String,
-    predict: Object,
     forecastPrice: Array,
     pastPrice: Array,
     accuracy: Number,
